@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(kill %1)",
+      "Bash(curl -s http://localhost:3003)",
+      "Bash(md5)"
+    ]
+  }
+}

@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+
+    /* Semantic state tokens */
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f4f4f5;
+
+    --color-verified-bg: #EAF3DE;
+    --color-verified-border: #97C459;
+    --color-verified-icon-bg: #C0DD97;
+    --color-verified-text: #27500A;
+    --color-verified-subtext: #3B6D11;
+
+    --color-error-bg: #FCEBEB;
+    --color-error-border: #F09595;
+    --color-error-icon-bg: #F7C1C1;
+    --color-error-text: #791F1F;
+    --color-error-subtext: #A32D2D;
+
+    --color-warning-bg: #FAEEDA;
+    --color-warning-border: #EF9F27;
+    --color-warning-icon-bg: #FAC775;
+    --color-warning-text: #633806;
+    --color-warning-subtext: #854F0B;
+
+    --color-scanline: #1D9E75;
+    --color-progress-fill: #27500A;
+    --color-action-btn-bg: #27500A;
+    --color-action-btn-text: #EAF3DE;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    --color-background-primary: #09090b;
+    --color-background-secondary: #18181b;
+
+    --color-verified-bg: #0D2207;
+    --color-verified-border: #2E5E12;
+    --color-verified-icon-bg: #1A3A0A;
+    --color-verified-text: #7DC44E;
+    --color-verified-subtext: #5FA33A;
+
+    --color-error-bg: #1A0505;
+    --color-error-border: #5A1515;
+    --color-error-icon-bg: #3D0A0A;
+    --color-error-text: #E05555;
+    --color-error-subtext: #C44444;
+
+    --color-warning-bg: #1A1005;
+    --color-warning-border: #7A4A10;
+    --color-warning-icon-bg: #5A3008;
+    --color-warning-text: #D48030;
+    --color-warning-subtext: #B06820;
+
+    --color-scanline: #1D9E75;
+    --color-progress-fill: #5FAA2E;
+    --color-action-btn-bg: #3A6E10;
+    --color-action-btn-text: #D4EDBE;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-color: var(--color-background-primary);
+  }
+}
+
+/* Scanning line animation (cannot use Tailwind arbitrary animation for top%) */
+@keyframes scan-move {
+  0%, 100% { top: 10%; }
+  50%       { top: 78%; }
+}
+
+.scan-line {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  border-radius: 9999px;
+  background-color: var(--color-scanline);
+  animation: scan-move 2s ease-in-out infinite;
+}
