@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Cairo } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  weight: ['400', '500', '600', '700'],
+});
 
 export const metadata: Metadata = {
-  title: 'Pack Verify — TASOOMA',
-  description: 'Warehouse order-verification tool for TASOOMA retail shoe store',
+  title: 'فحص التعبئة — OSSolution',
+  description: 'أداة التحقق من طلبات التعبئة',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>{children}</body>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <body className={cairo.className}>{children}</body>
     </html>
   );
 }
