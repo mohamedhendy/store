@@ -1,45 +1,52 @@
 import { create } from 'zustand';
-import { Invoice, ItemStatus, ScanEntry } from '@/types';
+import { Invoice, ScanEntry } from '@/types';
 
 interface StoreState {
   currentInvoice: Invoice | null;
-  itemStatuses: Record<string, ItemStatus>;
+  /** itemId → number of times successfully scanned */
+  itemScanCounts: Record<string, number>;
+  /** itemId → true while the error flash is active (duplicate scan) */
+  errorItems: Record<string, boolean>;
   scanHistory: ScanEntry[];
+
   setInvoice: (inv: Invoice) => void;
-  markVerified: (itemId: string) => void;
-  markError: (itemId: string) => void;
-  resetError: (itemId: string) => void;
+  incrementScan: (itemId: string) => void;
+  setError: (itemId: string) => void;
+  clearError: (itemId: string) => void;
   addScan: (entry: ScanEntry) => void;
   reset: () => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
   currentInvoice: null,
-  itemStatuses: {},
+  itemScanCounts: {},
+  errorItems: {},
   scanHistory: [],
 
   setInvoice: (inv) =>
     set({
       currentInvoice: inv,
-      itemStatuses: Object.fromEntries(
-        inv.items.map(item => [item.id, 'pending' as ItemStatus])
-      ),
+      itemScanCounts: Object.fromEntries(inv.items.map(item => [item.id, 0])),
+      errorItems: {},
       scanHistory: [],
     }),
 
-  markVerified: (itemId) =>
+  incrementScan: (itemId) =>
     set((state) => ({
-      itemStatuses: { ...state.itemStatuses, [itemId]: 'verified' },
+      itemScanCounts: {
+        ...state.itemScanCounts,
+        [itemId]: (state.itemScanCounts[itemId] ?? 0) + 1,
+      },
     })),
 
-  markError: (itemId) =>
+  setError: (itemId) =>
     set((state) => ({
-      itemStatuses: { ...state.itemStatuses, [itemId]: 'error' },
+      errorItems: { ...state.errorItems, [itemId]: true },
     })),
 
-  resetError: (itemId) =>
+  clearError: (itemId) =>
     set((state) => ({
-      itemStatuses: { ...state.itemStatuses, [itemId]: 'verified' },
+      errorItems: { ...state.errorItems, [itemId]: false },
     })),
 
   addScan: (entry) =>
@@ -50,7 +57,22 @@ export const useStore = create<StoreState>((set) => ({
   reset: () =>
     set({
       currentInvoice: null,
-      itemStatuses: {},
+      itemScanCounts: {},
+      errorItems: {},
       scanHistory: [],
     }),
 }));
+
+/** Derive display status for a single item */
+export function getItemStatus(
+  itemId: string,
+  qty: number,
+  itemScanCounts: Record<string, number>,
+  errorItems: Record<string, boolean>
+): import('@/types').ItemStatus {
+  if (errorItems[itemId]) return 'error';
+  const count = itemScanCounts[itemId] ?? 0;
+  if (count === 0) return 'pending';
+  if (count >= qty) return 'verified';
+  return 'partial';
+}

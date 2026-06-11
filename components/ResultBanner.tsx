@@ -4,10 +4,12 @@ import { BannerState, InvoiceItem } from '@/types';
 interface ResultBannerProps {
   state: BannerState;
   matchedItem?: InvoiceItem;
+  /** how many of this item have now been scanned (after this scan) */
+  matchCount?: number;
   noMatchBarcode?: string;
 }
 
-export function ResultBanner({ state, matchedItem, noMatchBarcode }: ResultBannerProps) {
+export function ResultBanner({ state, matchedItem, matchCount, noMatchBarcode }: ResultBannerProps) {
   if (state === 'idle') {
     return (
       <div
@@ -29,6 +31,11 @@ export function ResultBanner({ state, matchedItem, noMatchBarcode }: ResultBanne
   }
 
   if (state === 'match' && matchedItem) {
+    const allPacked = matchCount !== undefined && matchCount >= matchedItem.qty;
+    const subtitle = allPacked
+      ? `${matchedItem.name} — ${matchedItem.colour} · ${matchedItem.size} fully packed`
+      : `${matchedItem.name} — ${matchedItem.colour} · ${matchedItem.size} · ${matchCount} of ${matchedItem.qty} packed`;
+
     return (
       <div
         className="flex items-center gap-3 p-3 rounded-lg animate-slide-in"
@@ -51,7 +58,7 @@ export function ResultBanner({ state, matchedItem, noMatchBarcode }: ResultBanne
             Match confirmed
           </p>
           <p className="text-xs truncate" style={{ color: 'var(--color-verified-subtext)' }}>
-            {matchedItem.name} — {matchedItem.colour} · {matchedItem.size} verified
+            {subtitle}
           </p>
         </div>
       </div>
@@ -78,7 +85,7 @@ export function ResultBanner({ state, matchedItem, noMatchBarcode }: ResultBanne
         </div>
         <div className="min-w-0">
           <p className="text-sm font-medium" style={{ color: 'var(--color-error-text)' }}>
-            No match found
+            Wrong item
           </p>
           <p className="text-xs font-mono truncate" style={{ color: 'var(--color-error-subtext)' }}>
             Barcode {noMatchBarcode} is not in this order
@@ -108,10 +115,10 @@ export function ResultBanner({ state, matchedItem, noMatchBarcode }: ResultBanne
         </div>
         <div className="min-w-0">
           <p className="text-sm font-medium" style={{ color: 'var(--color-warning-text)' }}>
-            Already scanned
+            Already packed
           </p>
           <p className="text-xs truncate" style={{ color: 'var(--color-warning-subtext)' }}>
-            {matchedItem.name} was already verified
+            {matchedItem.name} — {matchedItem.colour} · {matchedItem.size} already fully packed
           </p>
         </div>
       </div>

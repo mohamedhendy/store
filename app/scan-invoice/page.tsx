@@ -5,21 +5,24 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, XCircle } from 'lucide-react';
 import { BarcodeScanner } from '@/components/BarcodeScanner';
-import { getInvoiceByBarcode } from '@/lib/invoiceData';
+import { fetchInvoiceByBarcode } from '@/lib/api';
 import { useStore } from '@/lib/store';
 
 export default function ScanInvoicePage() {
   const router = useRouter();
   const setInvoice = useStore((s) => s.setInvoice);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleScan = (barcode: string) => {
-    const invoice = getInvoiceByBarcode(barcode);
+  const handleScan = async (barcode: string) => {
+    setLoading(true);
+    const invoice = await fetchInvoiceByBarcode(barcode);
+    setLoading(false);
     if (invoice) {
       setInvoice(invoice);
       router.push(`/verify/${barcode}`);
     } else {
-      setError(`Invoice not found for barcode: ${barcode}`);
+      setError(`Invoice not found: ${barcode}`);
       setTimeout(() => setError(null), 4000);
     }
   };
@@ -46,6 +49,13 @@ export default function ScanInvoicePage() {
       {/* Scanner card */}
       <div className="rounded-lg border bg-card p-4 space-y-4">
         <BarcodeScanner onScan={handleScan} />
+
+        {/* Loading */}
+        {loading && (
+          <p className="text-xs text-center text-muted-foreground animate-pulse">
+            Looking up invoice…
+          </p>
+        )}
 
         {/* Error banner */}
         {error && (

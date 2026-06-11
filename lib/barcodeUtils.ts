@@ -3,7 +3,7 @@ import { Invoice, ScanResult } from '@/types';
 export function matchBarcode(
   barcode: string,
   invoice: Invoice,
-  itemStatuses: Record<string, string>
+  itemScanCounts: Record<string, number>
 ): ScanResult {
   const item = invoice.items.find(i => i.itemBarcode === barcode);
 
@@ -11,9 +11,11 @@ export function matchBarcode(
     return { type: 'nomatch', barcode };
   }
 
-  if (itemStatuses[item.id] === 'verified') {
+  const scanned = itemScanCounts[item.id] ?? 0;
+
+  if (scanned >= item.qty) {
     return { type: 'duplicate', item };
   }
 
-  return { type: 'match', item };
+  return { type: 'match', item, newCount: scanned + 1 };
 }

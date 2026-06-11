@@ -17,7 +17,8 @@ export interface Invoice {
   items: InvoiceItem[];
 }
 
-export type ItemStatus = 'pending' | 'verified' | 'error';
+/** pending=0 scanned, partial=some scanned, verified=all qty scanned, error=flash only */
+export type ItemStatus = 'pending' | 'partial' | 'verified' | 'error';
 
 export interface ScanEntry {
   barcode: string;
@@ -29,6 +30,6 @@ export interface ScanEntry {
 export type BannerState = 'idle' | 'match' | 'nomatch' | 'duplicate';
 
 export type ScanResult =
-  | { type: 'match'; item: InvoiceItem }
+  | { type: 'match'; item: InvoiceItem; newCount: number }
   | { type: 'nomatch'; barcode: string }
   | { type: 'duplicate'; item: InvoiceItem };

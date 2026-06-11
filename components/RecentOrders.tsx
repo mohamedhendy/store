@@ -10,13 +10,16 @@ type OrderStatus = 'complete' | 'in-progress' | 'pending';
 function deriveStatus(
   invoiceId: string,
   currentInvoice: ReturnType<typeof useStore.getState>['currentInvoice'],
-  itemStatuses: ReturnType<typeof useStore.getState>['itemStatuses']
+  itemScanCounts: ReturnType<typeof useStore.getState>['itemScanCounts']
 ): OrderStatus {
-  if (currentInvoice?.id !== invoiceId) return 'pending';
-  const statuses = Object.values(itemStatuses);
-  if (statuses.length === 0) return 'pending';
-  if (statuses.every((s) => s === 'verified')) return 'complete';
-  if (statuses.some((s) => s === 'verified')) return 'in-progress';
+  if (!currentInvoice || currentInvoice.id !== invoiceId) return 'pending';
+  const counts = Object.values(itemScanCounts);
+  if (counts.length === 0) return 'pending';
+  const packedCount = currentInvoice.items.filter(
+    item => (itemScanCounts[item.id] ?? 0) >= item.qty
+  ).length;
+  if (packedCount === currentInvoice.items.length) return 'complete';
+  if (packedCount > 0) return 'in-progress';
   return 'pending';
 }
 
@@ -39,15 +42,15 @@ const STATUS_STYLE: Record<OrderStatus, React.CSSProperties> = {
 };
 
 export function RecentOrders() {
-  const { currentInvoice, itemStatuses } = useStore();
+  const { currentInvoice, itemScanCounts } = useStore();
 
   return (
     <div className="space-y-2">
       {INVOICES.map((inv) => {
-        const status = deriveStatus(inv.id, currentInvoice, itemStatuses);
+        const status = deriveStatus(inv.id, currentInvoice, itemScanCounts);
         const verifiedCount =
           currentInvoice?.id === inv.id
-            ? Object.values(itemStatuses).filter((s) => s === 'verified').length
+            ? currentInvoice.items.filter(item => (itemScanCounts[item.id] ?? 0) >= item.qty).length
             : 0;
         const total = inv.items.length;
 
